@@ -1,4 +1,5 @@
 import { basename, extname } from 'node:path'
+import { readFile } from 'node:fs/promises'
 import type { Plugin, ResolvedConfig } from 'vite'
 import {
   applyTransforms,
@@ -125,18 +126,22 @@ export function imagetools(userOptions: Partial<VitePluginOptions> = {}): Plugin
         const { transforms } = generateTransforms(config, transformFactories, srcURL.searchParams, logger)
         const { image, metadata } = await applyTransforms(transforms, img.clone(), pluginOptions.removeMetadata)
 
-        if (viteConfig.command === 'serve') {
-          const id = await generateImageID(srcURL, config, img)
-          generatedImages.set(id, image)
-          metadata.src = basePath + id
+        if (directives.has('inline')) {
+          metadata.src = `data:image/${metadata.format};base64,${(await image.toBuffer()).toString('base64')}`
         } else {
-          const fileHandle = this.emitFile({
-            name: basename(srcURL.pathname, extname(srcURL.pathname)) + `.${metadata.format}`,
-            source: await image.toBuffer(),
-            type: 'asset'
-          })
+          if (viteConfig.command === 'serve') {
+            const id = await generateImageID(srcURL, config, img)
+            generatedImages.set(id, image)
+            metadata.src = basePath + id
+          } else {
+            const fileHandle = this.emitFile({
+              name: basename(srcURL.pathname, extname(srcURL.pathname)) + `.${metadata.format}`,
+              source: await image.toBuffer(),
+              type: 'asset'
+            })
 
-          metadata.src = `__VITE_ASSET__${fileHandle}__`
+            metadata.src = `__VITE_ASSET__${fileHandle}__`
+          }
         }
 
         metadata.image = image
