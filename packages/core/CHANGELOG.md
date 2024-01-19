@@ -1,5 +1,23 @@
 # Change Log
 
+## 6.0.4
+
+### Patch Changes
+
+- 0eca643: chore: bump sharp to 0.33.1
+
+## 6.0.3
+
+### Patch Changes
+
+- 5d7a77d: chore: update sharp to 0.33
+
+## 6.0.2
+
+### Patch Changes
+
+- e0ba6c0: fix: corrected imports to compile with `"moduleResolution": "nodenext"`
+
 ## 6.0.1
 
 ### Patch Changes
