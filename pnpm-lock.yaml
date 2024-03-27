@@ -97,7 +97,7 @@ importers:
         specifier: ^5.0.5
         version: 5.0.5(rollup@4.13.0)
       imagetools-core:
-        specifier: workspace:^
+        specifier: ^6.0.4
         version: link:../core
     devDependencies:
       '@rollup/plugin-typescript':
