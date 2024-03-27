@@ -1,6 +1,6 @@
 import { basename, extname } from 'node:path'
 import { join } from 'node:path/posix'
-import { existsSync, mkdirSync, createReadStream } from 'node:fs'
+import { statSync, mkdirSync, createReadStream } from 'node:fs'
 import { utimes, writeFile, readFile, opendir, stat, rm } from 'node:fs/promises'
 import type { Plugin, ResolvedConfig } from 'vite'
 import {
@@ -140,7 +140,7 @@ export function imagetools(userOptions: Partial<VitePluginOptions> = {}): Plugin
         let image: Sharp | undefined
         let metadata: ImageMetadata
 
-        if (cacheOptions.enabled && existsSync(`${cacheOptions.dir}/${id}`)) {
+        if (cacheOptions.enabled && (statSync(`${cacheOptions.dir}/${id}`, { throwIfNoEntry: false })?.size ?? 0) > 0) {
           const imagePath = `${cacheOptions.dir}/${id}`
           metadata = (await sharp(imagePath).metadata()) as ImageMetadata
           metadata.imagePath = imagePath
