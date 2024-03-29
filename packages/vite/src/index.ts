@@ -142,6 +142,9 @@ export function imagetools(userOptions: Partial<VitePluginOptions> = {}): Plugin
 
         if (cacheOptions.enabled && (statSync(`${cacheOptions.dir}/${id}`, { throwIfNoEntry: false })?.size ?? 0) > 0) {
           metadata = (await sharp(`${cacheOptions.dir}/${id}`).metadata()) as ImageMetadata
+          // fix avif metadata format https://github.com/lovell/sharp/issues/2504 https://github.com/lovell/sharp/issues/3746
+          if (config.format === 'avif' && metadata.format === 'heif' && metadata.compression === 'av1')
+            metadata.format = 'avif'
         } else {
           const { transforms } = generateTransforms(config, transformFactories, srcURL.searchParams, logger)
           const res = await applyTransforms(transforms, img, pluginOptions.removeMetadata)
